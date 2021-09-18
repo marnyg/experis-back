@@ -13,20 +13,19 @@ using Task13_MovieAPI.DTO;
 namespace backend.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class ServicesController : ControllerBase
+    [Route("/api/[controller]")]
+    public class ServiceController : ControllerBase
     {
         private readonly AppDbContext _context;
-        private readonly ILogger<ServicesController> _logger;
+        private readonly ILogger<ServiceController> _logger;
         private readonly IMapper _mapper;
 
 
-        public ServicesController(AppDbContext context, ILogger<ServicesController> logger, IMapper mapper)
+        public ServiceController(AppDbContext context, ILogger<ServiceController> logger, IMapper mapper)
         {
             _logger = logger;
             _context = context;
             _mapper = mapper;
-
         }
 
         [HttpGet]
