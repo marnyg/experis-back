@@ -13,7 +13,7 @@ using Task13_MovieAPI.DTO;
 namespace backend.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("/api/[controller]")]
     public class CustomerController : ControllerBase
     {
         private readonly AppDbContext _context;
