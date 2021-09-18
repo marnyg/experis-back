@@ -28,6 +28,9 @@ namespace backend
         public void ConfigureServices(IServiceCollection services)
         {
 
+            //setup automapper
+            services.AddAutoMapper(typeof(Startup));
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
