@@ -32,7 +32,7 @@ namespace backend.Controllers
         [HttpGet]
         public async Task<IEnumerable<Order>> GetAllAsync()
         {
-            var orders = await _context.Order.Select(ev => ev).ToArrayAsync();
+            var orders = await _context.Order.Select(customer => customer).ToArrayAsync();
             if (orders == null) { NotFound("No Orders found"); }
             return orders;
         }
@@ -40,20 +40,20 @@ namespace backend.Controllers
         public async Task<Order> GetByIdAsync(int id)
         {
             var order = await _context.Order
-            .Include(o => o.ToAddress)
-            .Include(o => o.FromAddress)
+            .Include(order => order.ToAddress)
+            .Include(order => order.FromAddress)
             .FirstAsync(order => order.Id == id);
 
             if (order == null) { NotFound("No categories found"); }
             return order;
         }
         [HttpPost]
-        public async Task<ActionResult<Order>> PostOrder(OrderDTO order)
+        public async Task<ActionResult<Order>> PostOrder(OrderDTO orderDTO)
         {
-            Order o = _mapper.Map<Order>(order);
-            _context.Order.Add(o);
+            Order order = _mapper.Map<Order>(orderDTO);
+            _context.Order.Add(order);
             await _context.SaveChangesAsync();
-            return o;
+            return order;
         }
         [HttpDelete]
         public async Task<ActionResult<Order>> DeleteOrder(int id)
