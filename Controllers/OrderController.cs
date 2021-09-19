@@ -48,6 +48,19 @@ namespace backend.Controllers
             if (order == null) { NotFound("No categories found"); }
             return order;
         }
+        [HttpGet("by-customer-id/{id}")]
+        public async Task<IEnumerable<Order>> GetByCustomerIdAsync(int id)
+        {
+            var order = await _context.Order
+            .Include(order => order.ToAddress)
+            .Include(order => order.FromAddress)
+            .Include(order => order.Customer)
+            .Where(order => order.CustomerId == id)
+            .ToArrayAsync();
+
+            if (order == null) { NotFound("No categories found"); }
+            return order;
+        }
         [HttpPost]
         public async Task<ActionResult<Order>> PostOrder(OrderDTO orderDTO)
         {
