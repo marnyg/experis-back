@@ -31,7 +31,7 @@ namespace backend.Controllers
         [HttpGet]
         public async Task<IEnumerable<ServiceType>> GetAllAsync()
         {
-            var serviceTypes = await _context.ServiceType.Select(service => service).ToArrayAsync();
+            var serviceTypes = await _context.ServiceType.ToArrayAsync();
             if (serviceTypes == null) { NotFound("No Services found"); }
             return serviceTypes;
         }

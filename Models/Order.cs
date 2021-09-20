@@ -26,6 +26,9 @@ namespace backend.Models
         public int ToAddressId{ get; set; }
         [Required]
         public Address ToAddress{ get; set; }
+        // [StringLength(500)]
+        [Required]
+        public ICollection< Service> Services{ get; set; }
         [StringLength(500)]
         public string OrderComment{ get; set; }
 

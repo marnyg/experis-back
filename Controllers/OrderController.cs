@@ -38,27 +38,47 @@ namespace backend.Controllers
             return orders;
         }
         [HttpGet("{id}")]
-        public async Task<Order> GetByIdAsync(int id)
+        public async Task<Object> GetByIdAsync(int id)
         {
             var order = await _context.Order
-            .Include(order => order.ToAddress)
-            .Include(order => order.FromAddress)
+            .Select(order => new
+            {
+                order.Id,
+                order.OrderComment,
+                order.Customer,
+                order.FromAddress,
+                order.ToAddress,
+                Services = order.Services.ToList()
+            })
+            // .Include(order => order.ToAddress)
+            // .Include(order => order.FromAddress)
             .FirstAsync(order => order.Id == id);
 
             if (order == null) { NotFound("No categories found"); }
             return order;
         }
         [HttpGet("by-customer-id/{id}")]
-        public async Task<IEnumerable<Order>> GetByCustomerIdAsync(int id)
+        public async Task<IEnumerable<object>> GetByCustomerIdAsync(int id)
         {
             var order = await _context.Order
-            .Include(order => order.ToAddress)
-            .Include(order => order.FromAddress)
-            .Include(order => order.Customer)
-            .Where(order => order.CustomerId == id)
+            .Include(o => o.Services)
+            .Select(order => new
+            {
+                order.Id,
+                order.OrderComment,
+                order.Customer,
+                order.FromAddress,
+                order.ToAddress,
+                Services = order.Services.Select(s =>
+                new { s.Date, s.Id, s.ServiceType, s.ServiceTypeId })
+            })
+            .Where(order => order.Customer.Id == id)
             .ToArrayAsync();
 
-            if (order == null) { NotFound("No categories found"); }
+            if (order == null)
+            {
+                NotFound("No categories found");
+            }
             return order;
         }
         [HttpPost]
@@ -67,9 +87,56 @@ namespace backend.Controllers
             Order order = _mapper.Map<Order>(orderDTO);
             _context.Order.Add(order);
             await _context.SaveChangesAsync();
+
+            orderDTO.ServiceIds.ToList().ForEach(s =>
+            {
+                Service newService = new Service()
+                {
+                    OrderId = order.Id,
+                    ServiceTypeId = s,
+                    Date = orderDTO.Date,
+                };
+                _context.Service.Add(newService);
+            });
+            await _context.SaveChangesAsync();
             return order;
         }
-        [HttpDelete]
+        [HttpPut]
+        public async Task<ActionResult<Order>> PutOrder(OrderDTO orderDTO)
+        {
+            Order existingOrder = await _context.Order.Where(o => o.Id == orderDTO.Id).FirstOrDefaultAsync();
+            var orderServices = await _context.Service
+            .Where(s => s.OrderId == orderDTO.Id)
+            .ToListAsync();
+
+            orderServices.ForEach(s => _context.Remove(s));
+            if (existingOrder != null)
+            {
+                existingOrder.CustomerId = orderDTO.CustomerId;
+                existingOrder.FromAddressId = orderDTO.FromAddressId;
+                existingOrder.ToAddressId = orderDTO.ToAddressId;
+                existingOrder.OrderComment = orderDTO.OrderComment;
+
+                orderDTO.ServiceIds.ToList().ForEach(s =>
+                {
+                    Service newService = new Service()
+                    {
+                        OrderId = orderDTO.Id,
+                        ServiceTypeId = s,
+                        Date = orderDTO.Date,
+                    };
+                    _context.Service.Add(newService);
+                });
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                return NotFound();
+            }
+
+            return Ok(existingOrder);
+        }
+        [HttpDelete("{id}")]
         public async Task<ActionResult<Order>> DeleteOrder(int id)
         {
             var order = await _context.Order.FindAsync(id);

@@ -32,7 +32,7 @@ namespace backend.Controllers
         [HttpGet]
         public async Task<IEnumerable<Address>> GetAllAsync()
         {
-            var address = await _context.Address.Select(address => address).ToArrayAsync();
+            var address = await _context.Address.ToArrayAsync();
             if (address == null) { NotFound("No Addresss found"); }
             return address;
         }

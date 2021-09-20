@@ -13,5 +13,6 @@ namespace Task13_MovieAPI.DTO
         public int ToAddressId{ get; set; }
         public ICollection<int> ServiceIds{ get; set; }
         public string OrderComment{ get; set; }
+        public DateTime Date{ get; set; }
     }
 }

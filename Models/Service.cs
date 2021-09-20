@@ -18,8 +18,6 @@ namespace backend.Models
         [Required]
         public int OrderId { get; set; }
         [Required]
-        public Order Order { get; set; }
-        [Required]
         public int ServiceTypeId { get; set; }
         [Required]
         public ServiceType ServiceType { get; set; }

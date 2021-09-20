@@ -31,7 +31,9 @@ namespace backend.Controllers
         [HttpGet]
         public async Task<IEnumerable<Service>> GetAllAsync()
         {
-            var orders = await _context.Service.Select(service => service).ToArrayAsync();
+            var orders = await _context.Service
+            .Include(service => service.ServiceType)
+            .ToArrayAsync();
             if (orders == null) { NotFound("No Services found"); }
             return orders;
         }
@@ -39,7 +41,6 @@ namespace backend.Controllers
         public async Task<Service> GetByIdAsync(int id)
         {
             var order = await _context.Service
-            .Include(service => service.Order)
             .Include(service => service.ServiceType)
             .FirstAsync(service => service.Id == id);
 

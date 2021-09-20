@@ -31,7 +31,9 @@ namespace backend.Controllers
         [HttpGet]
         public async Task<IEnumerable<Customer>> GetAllAsync()
         {
-            var customer = await _context.Customer.Select(customer => customer).ToArrayAsync();
+            var customer = await _context.Customer
+            .Include(customer => customer.CurrentAddress)
+            .ToArrayAsync();
             if (customer == null) { NotFound("No Customers found"); }
             return customer;
         }
